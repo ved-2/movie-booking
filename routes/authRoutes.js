@@ -4,37 +4,32 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const { isNotLoggedIn } = require('../middleware/auth');
 
-// Login page - only accessible if not logged in
-router.get('/login', isNotLoggedIn, (req, res) => {
-    res.render('auth/login', { 
-        title: 'Login - Movie Booking System',
-        returnTo: req.session.returnTo || '/'
+// Login choice page
+router.get('/login-choice', isNotLoggedIn, (req, res) => {
+    res.render('auth/login-choice', { 
+        title: 'Choose Login Type - Movie Booking System'
     });
 });
 
-// Register page - only accessible if not logged in
-router.get('/register', isNotLoggedIn, (req, res) => {
-    res.render('auth/register', { 
-        title: 'Register - Movie Booking System' 
+// User login page
+router.get('/user-login', isNotLoggedIn, (req, res) => {
+    res.render('auth/user-login', { 
+        title: 'User Login - Movie Booking System'
     });
 });
 
-// Login process
-router.post('/login', isNotLoggedIn, async (req, res) => {
+// Admin login page
+router.get('/admin-login', isNotLoggedIn, (req, res) => {
+    res.render('auth/admin-login', { 
+        title: 'Admin Login - Movie Booking System'
+    });
+});
+
+// User login process
+router.post('/user-login', isNotLoggedIn, async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        // Check for admin login
-        if (email === 'admin@admin.com' && password === 'admin123') {
-            req.session.user = {
-                id: 'admin',
-                username: 'admin',
-                email: 'admin@admin.com',
-                role: 'admin'
-            };
-            return res.redirect('/admin/dashboard');
-        }
-
         // For regular users, just create a new account if it doesn't exist
         let user = await User.findOne({ email });
         
@@ -49,7 +44,6 @@ router.post('/login', isNotLoggedIn, async (req, res) => {
             await user.save();
         }
 
-        // Log the user in
         req.session.user = {
             id: user._id,
             username: user.username,
@@ -57,17 +51,54 @@ router.post('/login', isNotLoggedIn, async (req, res) => {
             role: user.role
         };
 
-        // Redirect to the originally requested URL or home
-        const returnTo = req.session.returnTo || '/';
-        delete req.session.returnTo;
-        res.redirect(returnTo);
+        res.redirect('/movies');
     } catch (error) {
         console.error('Login error:', error);
-        res.render('auth/login', {
+        res.render('auth/user-login', {
             error: 'An error occurred during login',
-            title: 'Login - Movie Booking System'
+            title: 'User Login - Movie Booking System'
         });
     }
+});
+
+// Admin login process
+router.post('/admin-login', isNotLoggedIn, async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        if (email === 'admin@admin.com' && password === 'admin123') {
+            req.session.user = {
+                id: 'admin',
+                username: 'admin',
+                email: 'admin@admin.com',
+                role: 'admin'
+            };
+            return res.redirect('/admin/dashboard');
+        }
+
+        res.render('auth/admin-login', {
+            error: 'Invalid admin credentials',
+            title: 'Admin Login - Movie Booking System'
+        });
+    } catch (error) {
+        console.error('Admin login error:', error);
+        res.render('auth/admin-login', {
+            error: 'An error occurred during login',
+            title: 'Admin Login - Movie Booking System'
+        });
+    }
+});
+
+// Update the root login route to redirect to login choice
+router.get('/login', (req, res) => {
+    res.redirect('/auth/login-choice');
+});
+
+// Register page - only accessible if not logged in
+router.get('/register', isNotLoggedIn, (req, res) => {
+    res.render('auth/register', { 
+        title: 'Register - Movie Booking System' 
+    });
 });
 
 // Register process - Simplified for users

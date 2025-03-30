@@ -1,0 +1,90 @@
+<div class="container mt-4">
+    <div class="row">
+        <!-- Movie and Show Info -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <img src="<%= show.movie.posterUrl %>" class="card-img-top" alt="<%= show.movie.title %>">
+                <div class="card-body">
+                    <h4 class="card-title"><%= show.movie.title %></h4>
+                    <p class="card-text">
+                        <strong>Theater:</strong> <%= show.theater.name %><br>
+                        <strong>Screen:</strong> <%= show.screen %><br>
+                        <strong>Show Time:</strong> <%= show.showTime.toLocaleString() %><br>
+                    </p>
+                    <div class="price-info">
+                        <h5>Ticket Prices:</h5>
+                        <ul class="list-unstyled">
+                            <li>VIP: ₹<%= show.price.vip %></li>
+                            <li>Premium: ₹<%= show.price.premium %></li>
+                            <li>Standard: ₹<%= show.price.standard %></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seat Selection -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4>Select Seats</h4>
+                    
+                    <div class="screen-container text-center mb-4">
+                        <div class="screen mb-4">
+                            <p class="text-muted mb-2">SCREEN</p>
+                            <div class="screen-line"></div>
+                        </div>
+
+                        <div class="seat-legend mb-3">
+                            <div class="d-flex justify-content-center gap-3">
+                                <div><span class="seat-demo standard"></span> Standard (₹<%= show.price.standard %>)</div>
+                                <div><span class="seat-demo premium"></span> Premium (₹<%= show.price.premium %>)</div>
+                                <div><span class="seat-demo vip"></span> VIP (₹<%= show.price.vip %>)</div>
+                            </div>
+                            <div class="d-flex justify-content-center gap-3 mt-2">
+                                <div><span class="seat-demo available"></span> Available</div>
+                                <div><span class="seat-demo booked"></span> Booked</div>
+                                <div><span class="seat-demo selected"></span> Selected</div>
+                            </div>
+                        </div>
+
+                        <div class="seats-grid">
+                            <% const currentScreen = show.theater.screens.find(s => s.screenNumber === show.screen); %>
+                            <% currentScreen.seats.forEach(seat => { %>
+                                <div class="seat <%= seat.type %> <%= show.availableSeats.includes(seat.row + seat.number) ? 'available' : 'booked' %>"
+                                     data-row="<%= seat.row %>" 
+                                     data-number="<%= seat.number %>"
+                                     data-type="<%= seat.type %>"
+                                     data-price="<%= show.price[seat.type] %>">
+                                    <%= seat.row %><%= seat.number %>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+
+                    <form action="/bookings" method="POST" id="bookingForm" class="mt-4">
+                        <input type="hidden" name="showId" value="<%= show._id %>">
+                        <input type="hidden" name="selectedSeats" id="selectedSeatsInput">
+                        <input type="hidden" name="totalAmount" id="totalAmountInput">
+                        
+                        <div class="booking-summary card">
+                            <div class="card-body">
+                                <h5 class="card-title">Booking Summary</h5>
+                                <div class="mb-3">
+                                    <p class="mb-2"><strong>Selected Seats:</strong> <span id="selectedSeatsDisplay">None</span></p>
+                                    <p class="mb-2"><strong>Total Amount:</strong> ₹<span id="totalAmount">0</span></p>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-lg w-100" id="bookButton">
+                                    Confirm Booking
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="/css/booking.css">
+<script src="/js/booking.js"></script> 

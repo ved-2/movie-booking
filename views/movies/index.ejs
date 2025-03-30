@@ -1,23 +1,58 @@
 <div class="container mt-4">
-    <h1>Now Showing</h1>
-    <div class="row mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Movies</h1>
+        </div>
+        <% if (currentUser && currentUser.role === 'admin') { %>
+            <div class="col text-end">
+                <a href="/admin/movies/new" class="btn btn-primary">Add New Movie</a>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
         <% movies.forEach(movie => { %>
-            <div class="col-md-4 mb-4">
-                <div class="card movie-card">
+            <div class="col">
+                <div class="card h-100 movie-card">
                     <img src="<%= movie.posterUrl %>" class="card-img-top" alt="<%= movie.title %>">
                     <div class="card-body">
                         <h5 class="card-title"><%= movie.title %></h5>
-                        <p class="card-text"><%= movie.description.substring(0, 100) %>...</p>
-                        <p class="card-text">
-                            <small class="text-muted">
-                                Duration: <%= movie.duration %> mins | 
-                                Genre: <%= movie.genre.join(', ') %>
-                            </small>
+                        <p class="card-text text-muted">
+                            <%= movie.genre.join(', ') %> | <%= movie.duration %> mins
                         </p>
-                        <a href="/movies/<%= movie._id %>" class="btn btn-primary">View Details</a>
+                        <p class="card-text"><%= movie.description.substring(0, 100) %>...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="/movies/<%= movie._id %>" class="btn btn-primary">View Details</a>
+                            <% if (currentUser && currentUser.role === 'admin') { %>
+                                <div class="btn-group">
+                                    <a href="/admin/movies/<%= movie._id %>/edit" class="btn btn-warning">Edit</a>
+                                    <form action="/movies/<%= movie._id %>?_method=DELETE" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this movie?');">
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Rating: <%= movie.rating %>/10</small>
                     </div>
                 </div>
             </div>
         <% }) %>
     </div>
 </div>
+
+<style>
+.movie-card img {
+    height: 400px;
+    object-fit: cover;
+}
+
+.movie-card {
+    transition: transform 0.2s;
+}
+
+.movie-card:hover {
+    transform: translateY(-5px);
+}
+</style>

@@ -1,0 +1,77 @@
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Edit Show</h3>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/shows/<%= show._id %>?_method=PUT" method="POST">
+                        <div class="mb-3">
+                            <label for="movieId" class="form-label">Movie</label>
+                            <select class="form-select" id="movieId" name="movieId" required>
+                                <% movies.forEach(movie => { %>
+                                    <option value="<%= movie._id %>" <%= show.movie._id.toString() === movie._id.toString() ? 'selected' : '' %>>
+                                        <%= movie.title %>
+                                    </option>
+                                <% }); %>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="theaterId" class="form-label">Theater</label>
+                            <select class="form-select" id="theaterId" name="theaterId" required>
+                                <% theaters.forEach(theater => { %>
+                                    <option value="<%= theater._id %>" <%= show.theater._id.toString() === theater._id.toString() ? 'selected' : '' %>>
+                                        <%= theater.name %>
+                                    </option>
+                                <% }); %>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="screen" class="form-label">Screen Number</label>
+                            <input type="number" class="form-control" id="screen" name="screen" value="<%= show.screen %>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="showTime" class="form-label">Show Time</label>
+                            <input type="datetime-local" class="form-control" id="showTime" name="showTime" 
+                                value="<%= show.showTime.toISOString().slice(0, 16) %>" required>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Ticket Prices</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label for="price[standard]" class="form-label">Standard</label>
+                                        <input type="number" class="form-control" id="price[standard]" name="price[standard]" 
+                                            value="<%= show.price.standard %>" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="price[premium]" class="form-label">Premium</label>
+                                        <input type="number" class="form-control" id="price[premium]" name="price[premium]" 
+                                            value="<%= show.price.premium %>" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="price[vip]" class="form-label">VIP</label>
+                                        <input type="number" class="form-control" id="price[vip]" name="price[vip]" 
+                                            value="<%= show.price.vip %>" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/admin/dashboard#shows" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Show</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

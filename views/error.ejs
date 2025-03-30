@@ -1,10 +1,12 @@
-<%- include('layouts/boilerplate') %>
-
 <div class="container text-center mt-5">
     <h1 class="text-danger">Oops! Something went wrong</h1>
-    <p class="lead">We're sorry, but there was an error processing your request.</p>
-    <% if (typeof error !== 'undefined' && error.message) { %>
-        <p class="text-muted"><%= error.message %></p>
+    <% if (typeof error !== 'undefined') { %>
+        <div class="alert alert-danger mt-4">
+            <h4><%= error.message || 'An unexpected error occurred' %></h4>
+            <% if (process.env.NODE_ENV !== 'production') { %>
+                <pre class="mt-3 text-start"><%= error.stack %></pre>
+            <% } %>
+        </div>
     <% } %>
-    <a href="/" class="btn btn-primary">Return to Home</a>
+    <a href="/" class="btn btn-primary mt-4">Return to Home</a>
 </div> 

@@ -1,0 +1,106 @@
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Add New Theater</h2>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/theaters" method="POST">
+                        <!-- Basic Theater Info -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Theater Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" required>
+                        </div>
+
+                        <!-- Screen Configuration -->
+                        <div class="mb-4">
+                            <h4>Screen Configuration</h4>
+                            <div id="screens">
+                                <div class="screen-config mb-3 border p-3 rounded">
+                                    <h5>Screen 1</h5>
+                                    <input type="hidden" name="screens[0][screenNumber]" value="1">
+                                    
+                                    <!-- Seat Configuration -->
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label class="form-label">VIP Rows (A-H)</label>
+                                            <input type="text" class="form-control" name="screens[0][vipRows]" 
+                                                   placeholder="e.g., A,B" value="A,B">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Premium Rows</label>
+                                            <input type="text" class="form-control" name="screens[0][premiumRows]" 
+                                                   placeholder="e.g., G,H" value="G,H">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Seats per Row</label>
+                                            <input type="number" class="form-control" name="screens[0][seatsPerRow]" 
+                                                   value="12" min="1" max="20">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary" id="addScreen">Add Another Screen</button>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Create Theater</button>
+                            <a href="/admin/dashboard#theaters" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const screensContainer = document.getElementById('screens');
+    const addScreenButton = document.getElementById('addScreen');
+    let screenCount = 1;
+
+    addScreenButton.addEventListener('click', function() {
+        screenCount++;
+        const screenDiv = document.createElement('div');
+        screenDiv.className = 'screen-config mb-3 border p-3 rounded';
+        screenDiv.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5>Screen ${screenCount}</h5>
+                <button type="button" class="btn btn-danger btn-sm remove-screen">Remove</button>
+            </div>
+            <input type="hidden" name="screens[${screenCount-1}][screenNumber]" value="${screenCount}">
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label">VIP Rows (A-H)</label>
+                    <input type="text" class="form-control" name="screens[${screenCount-1}][vipRows]" 
+                           placeholder="e.g., A,B" value="A,B">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Premium Rows</label>
+                    <input type="text" class="form-control" name="screens[${screenCount-1}][premiumRows]" 
+                           placeholder="e.g., G,H" value="G,H">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Seats per Row</label>
+                    <input type="number" class="form-control" name="screens[${screenCount-1}][seatsPerRow]" 
+                           value="12" min="1" max="20">
+                </div>
+            </div>
+        `;
+        screensContainer.appendChild(screenDiv);
+
+        // Add remove functionality
+        screenDiv.querySelector('.remove-screen').addEventListener('click', function() {
+            screenDiv.remove();
+        });
+    });
+});
+</script> 

@@ -1,0 +1,88 @@
+<div class="container mt-4">
+    <h1>Add New Show</h1>
+    <form action="/admin/shows" method="POST" class="mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="movie" class="form-label">Select Movie</label>
+                    <select class="form-select" id="movie" name="movie" required>
+                        <option value="">Choose a movie...</option>
+                        <% movies.forEach(movie => { %>
+                            <option value="<%= movie._id %>"><%= movie.title %></option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="theater" class="form-label">Select Theater</label>
+                    <select class="form-select" id="theater" name="theater" required>
+                        <option value="">Choose a theater...</option>
+                        <% theaters.forEach(theater => { %>
+                            <option value="<%= theater._id %>"><%= theater.name %></option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="screen" class="form-label">Screen Number</label>
+                    <select class="form-select" id="screen" name="screen" required disabled>
+                        <option value="">Select theater first...</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="showTime" class="form-label">Show Time</label>
+                    <input type="datetime-local" class="form-control" id="showTime" name="showTime" required>
+                </div>
+
+                <div class="mb-3">
+                    <h5>Ticket Prices</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="priceStandard" class="form-label">Standard</label>
+                            <input type="number" class="form-control" id="priceStandard" name="price[standard]" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="pricePremium" class="form-label">Premium</label>
+                            <input type="number" class="form-control" id="pricePremium" name="price[premium]" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="priceVip" class="form-label">VIP</label>
+                            <input type="number" class="form-control" id="priceVip" name="price[vip]" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Show</button>
+                <a href="/admin/dashboard" class="btn btn-secondary">Cancel</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('theater').addEventListener('change', function() {
+    const theaterId = this.value;
+    const screenSelect = document.getElementById('screen');
+    
+    if (!theaterId) {
+        screenSelect.disabled = true;
+        screenSelect.innerHTML = '<option value="">Select theater first...</option>';
+        return;
+    }
+
+    // Fetch screens for selected theater
+    fetch(`/api/theaters/${theaterId}/screens`)
+        .then(response => response.json())
+        .then(screens => {
+            screenSelect.innerHTML = screens.map(screen => 
+                `<option value="${screen.screenNumber}">Screen ${screen.screenNumber}</option>`
+            ).join('');
+            screenSelect.disabled = false;
+        })
+        .catch(error => {
+            console.error('Error fetching screens:', error);
+            screenSelect.innerHTML = '<option value="">Error loading screens</option>';
+        });
+});
+</script> 

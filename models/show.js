@@ -20,15 +20,24 @@ const showSchema = new mongoose.Schema({
         required: true
     },
     price: {
-        standard: Number,
-        premium: Number,
-        vip: Number
+        standard: {
+            type: Number,
+            required: true
+        },
+        premium: {
+            type: Number,
+            required: true
+        },
+        vip: {
+            type: Number,
+            required: true
+        }
     },
     availableSeats: [{
-        row: String,
-        number: Number,
         type: String
     }]
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('Show', showSchema); 

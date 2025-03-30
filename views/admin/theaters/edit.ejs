@@ -1,0 +1,70 @@
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Edit Theater</h3>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/theaters/<%= theater._id %>?_method=PUT" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Theater Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="<%= theater.name %>" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" value="<%= theater.location %>" required>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Screens</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Screen Number</th>
+                                                <th>Total Seats</th>
+                                                <th>Seat Types</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% theater.screens.forEach(screen => { %>
+                                                <tr>
+                                                    <td><%= screen.screenNumber %></td>
+                                                    <td><%= screen.seats.length %></td>
+                                                    <td>
+                                                        <% 
+                                                        const seatCounts = screen.seats.reduce((acc, seat) => {
+                                                            acc[seat.type] = (acc[seat.type] || 0) + 1;
+                                                            return acc;
+                                                        }, {});
+                                                        %>
+                                                        <% Object.entries(seatCounts).forEach(([type, count]) => { %>
+                                                            <span class="badge bg-<%= type === 'vip' ? 'warning' : type === 'premium' ? 'info' : 'secondary' %> me-1">
+                                                                <%= type %>: <%= count %>
+                                                            </span>
+                                                        <% }); %>
+                                                    </td>
+                                                </tr>
+                                            <% }); %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <small class="text-muted">Note: Screen configuration can only be modified by contacting support.</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="/admin/dashboard#theaters" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Theater</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

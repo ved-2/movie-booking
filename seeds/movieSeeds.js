@@ -5,30 +5,36 @@ require('dotenv').config();
 const movies = [
     {
         title: "Inception",
-        description: "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+        description: "A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
         duration: 148,
         genre: ["Action", "Sci-Fi", "Thriller"],
+        rating: 8.8,
+        posterUrl: "https://example.com/inception.jpg",
         releaseDate: new Date("2010-07-16"),
-        posterUrl: "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg",
-        rating: 8.8
+        director: "Christopher Nolan",
+        cast: ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Ellen Page"]
     },
     {
         title: "The Dark Knight",
         description: "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
         duration: 152,
         genre: ["Action", "Crime", "Drama"],
+        rating: 9.0,
+        posterUrl: "https://example.com/dark-knight.jpg",
         releaseDate: new Date("2008-07-18"),
-        posterUrl: "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg",
-        rating: 9.0
+        director: "Christopher Nolan",
+        cast: ["Christian Bale", "Heath Ledger", "Aaron Eckhart"]
     },
     {
         title: "Interstellar",
         description: "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
         duration: 169,
         genre: ["Adventure", "Drama", "Sci-Fi"],
+        rating: 8.6,
+        posterUrl: "https://example.com/interstellar.jpg",
         releaseDate: new Date("2014-11-07"),
-        posterUrl: "https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
-        rating: 8.6
+        director: "Christopher Nolan",
+        cast: ["Matthew McConaughey", "Anne Hathaway", "Jessica Chastain"]
     },
     {
         title: "The Matrix",
@@ -67,19 +73,21 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/movie-boo
 .then(async () => {
     console.log('Connected to MongoDB');
     
-    // Clear existing movies
-    await Movie.deleteMany({});
-    console.log('Cleared existing movies');
+    try {
+        // Clear existing movies
+        await Movie.deleteMany({});
+        console.log('Cleared existing movies');
 
-    // Insert new movies
-    await Movie.insertMany(movies);
-    console.log('Sample movies added to database');
-
-    // Disconnect from MongoDB
+        // Insert new movies
+        await Movie.insertMany(movies);
+        console.log('Sample movies added successfully');
+    } catch (error) {
+        console.error('Error seeding movies:', error);
+    }
+    
     mongoose.disconnect();
-    console.log('Disconnected from MongoDB');
 })
 .catch(err => {
-    console.error('Error:', err);
+    console.error('MongoDB connection error:', err);
     mongoose.disconnect();
 }); 

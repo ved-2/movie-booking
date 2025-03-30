@@ -4,6 +4,8 @@ const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
 const methodOverride = require('method-override');
+const flash = require('connect-flash');
+const { scheduleShowUpdates } = require('./utils/showUpdater');
 require('dotenv').config();
 
 // Import routes
@@ -21,56 +23,77 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/movie-boo
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-.then(() => console.log('Connected to MongoDB'))
+.then(() => {
+    console.log('Connected to MongoDB');
+    scheduleShowUpdates();
+})
 .catch(err => console.error('MongoDB connection error:', err));
 
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Express layouts setup
+// Express layouts setup - Must come BEFORE routes
 app.use(expressLayouts);
 app.set('layout', 'layouts/boilerplate');
-app.set("layout extractScripts", true);
-app.set("layout extractStyles", true);
+app.set('layout extractScripts', true);
+app.set('layout extractStyles', true);
 
-// Middleware
+// Static files
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Body parsing middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(methodOverride('_method')); // For PUT/DELETE requests
+app.use(methodOverride('_method'));
 
 // Session configuration
 app.use(session({
-    secret: 'your-secret-key',
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: process.env.NODE_ENV === 'production' }
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
 }));
 
-// Add user to all templates
+// Flash messages middleware
+app.use(flash());
 app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
     res.locals.currentUser = req.session.user;
     next();
 });
 
+// Add this after your other middleware configurations
+app.use((req, res, next) => {
+    res.setHeader(
+        'Content-Security-Policy',
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+        "img-src 'self' https: data:; " +
+        "font-src 'self' https:; "
+    );
+    next();
+});
+
 // Routes
-app.get('/', async (req, res) => {
-    // Redirect to login if not authenticated
+app.get('/', (req, res) => {
+    // Redirect to login choice if not authenticated
     if (!req.session.user) {
-        return res.redirect('/auth/login');
+        return res.redirect('/auth/login-choice');
     }
     
-    // If authenticated, show movies
-    try {
-        const movies = await require('./controllers/dbOperations').getAllMovies();
-        res.render('movies/index', { 
-            movies,
-            title: 'Home - Movie Booking System'
-        });
-    } catch (error) {
-        res.status(500).send('Error loading homepage');
+    // If authenticated, redirect based on role
+    if (req.session.user.role === 'admin') {
+        return res.redirect('/admin/dashboard');
     }
+    
+    // For regular users, show movies
+    res.redirect('/movies');
 });
 
 // Mount all routes
@@ -85,8 +108,7 @@ app.use('/user', userRoutes);
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).render('error', { 
-        error: err, 
-        message: err.message,
+        error: err,
         title: 'Error - Movie Booking System'
     });
 });

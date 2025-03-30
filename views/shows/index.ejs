@@ -1,0 +1,20 @@
+<div class="container mt-4">
+    <h1>All Shows</h1>
+    <div class="row">
+        <% shows.forEach(show => { %>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= show.movie.title %></h5>
+                        <p class="card-text">
+                            <strong>Theater:</strong> <%= show.theater.name %><br>
+                            <strong>Screen:</strong> <%= show.screen %><br>
+                            <strong>Time:</strong> <%= show.showTime.toLocaleString() %>
+                        </p>
+                        <a href="/shows/<%= show._id %>/book" class="btn btn-primary">Book Tickets</a>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+</div> 

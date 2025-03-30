@@ -1,0 +1,28 @@
+<div class="container mt-4">
+    <h1>My Bookings</h1>
+    <div class="row">
+        <% bookings.forEach(booking => { %>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= booking.show.movie.title %></h5>
+                        <div class="booking-details">
+                            <p><strong>Theater:</strong> <%= booking.show.theater.name %></p>
+                            <p><strong>Screen:</strong> <%= booking.show.screen %></p>
+                            <p><strong>Show Time:</strong> <%= booking.show.showTime.toLocaleString() %></p>
+                            <p><strong>Seats:</strong> <%= booking.seats.join(', ') %></p>
+                            <p><strong>Amount Paid:</strong> ₹<%= booking.totalAmount %></p>
+                            <p><strong>Booking Date:</strong> <%= booking.createdAt.toLocaleString() %></p>
+                        </div>
+                        <% if (new Date(booking.show.showTime) > new Date()) { %>
+                            <form action="/bookings/<%= booking._id %>?_method=DELETE" method="POST" 
+                                  onsubmit="return confirm('Are you sure you want to cancel this booking?')">
+                                <button type="submit" class="btn btn-danger">Cancel Booking</button>
+                            </form>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+</div> 

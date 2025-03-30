@@ -66,4 +66,17 @@ exports.getAllTheaters = async () => {
 
 exports.getTheaterById = async (id) => {
     return await Theater.findById(id);
+};
+
+exports.createTheater = async (theaterData) => {
+    const theater = new Theater(theaterData);
+    return await theater.save();
+};
+
+exports.deleteMovie = async (movieId) => {
+    return await Movie.findByIdAndDelete(movieId);
+};
+
+exports.deleteShowsByMovie = async (movieId) => {
+    return await Show.deleteMany({ movie: movieId });
 }; 

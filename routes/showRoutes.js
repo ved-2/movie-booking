@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { isLoggedIn } = require('../middleware/auth');
 const dbOperations = require('../controllers/dbOperations');
+const showController = require('../controllers/showController');
 
 // Get all shows
 router.get('/', async (req, res) => {
@@ -61,5 +62,7 @@ router.get('/:id', isLoggedIn, async (req, res) => {
         res.status(500).render('error', { error });
     }
 });
+
+router.get('/:id/book', isLoggedIn, showController.getBookingPage);
 
 module.exports = router; 

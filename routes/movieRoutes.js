@@ -64,4 +64,19 @@ router.get('/:id/shows', async (req, res) => {
     }
 });
 
+// Delete movie
+router.delete('/:id', isAdmin, async (req, res) => {
+    try {
+        await dbOperations.deleteMovie(req.params.id);
+        // Delete associated shows
+        await dbOperations.deleteShowsByMovie(req.params.id);
+        res.redirect('/movies');
+    } catch (error) {
+        res.status(500).render('error', { 
+            error,
+            title: 'Error - Movie Booking System'
+        });
+    }
+});
+
 module.exports = router; 

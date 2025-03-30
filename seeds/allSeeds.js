@@ -95,8 +95,54 @@ const movies = [
         releaseDate: new Date("2019-11-08"),
         posterUrl: "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjcwN2Q5NTVkXkEyXkFqcGdeQXVyODk4OTc3MTY@._V1_.jpg",
         rating: 8.6
+    },
+    {
+        title: "Ford v Ferrari",
+        description: "American car designer Carroll Shelby and driver Ken Miles battle corporate interference to build a revolutionary race car for Ford.",
+        duration: 152,
+        genre: ["Action", "Biography", "Drama"],
+        releaseDate: new Date("2019-11-15"),
+        posterUrl: "https://m.media-amazon.com/images/M/MV5BMjI2MDQ4Mzk2OV5BMl5BanBnXkFtZTgwNzQ1OTc3NjM@._V1_.jpg",
+        rating: 8.1
+    },
+    {
+        title: "Joker",
+        description: "In Gotham City, mentally troubled comedian Arthur Fleck is disregarded and mistreated by society, setting him on a downward spiral of revolution and crime.",
+        duration: 122,
+        genre: ["Crime", "Drama", "Thriller"],
+        releaseDate: new Date("2019-10-04"),
+        posterUrl: "https://m.media-amazon.com/images/M/MV5BMjJkMTMwYzUtYWFmOC00MjJlLWE2MzAtZmU1NmYxYTY4N2YzXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg",
+        rating: 8.4
+    },
+    {
+        title: "Tenet",
+        description: "Armed with only one word, Tenet, and fighting for the survival of the world, a protagonist journeys through a twilight world of international espionage.",
+        duration: 150,
+        genre: ["Action", "Sci-Fi", "Thriller"],
+        releaseDate: new Date("2020-08-26"),
+        posterUrl: "https://m.media-amazon.com/images/M/MV5BNjQ3OTc4NmUtY2VhNy00ZmVkLWJlMzEtNzM2ZWI5ODMzZmE4XkEyXkFqcGdeQXVyMTA4NjE0NjEy._V1_.jpg",
+        rating: 7.8
+    },
+    {
+        title: "The Irishman",
+        description: "Hitman Frank Sheeran looks back at the secrets he kept as a loyal member of the Bufalino crime family.",
+        duration: 209,
+        genre: ["Biography", "Crime", "Drama"],
+        releaseDate: new Date("2019-11-27"),
+        posterUrl: "https://m.media-amazon.com/images/M/MV5BZTExMDkyMTUtZDNmNi00NjI3LTlkM2EtMGEyNzJhODI3NzljXkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg",
+        rating: 7.8
+    },
+    {
+        title: "1917",
+        description: "Two British soldiers embark on a dangerous mission to save 1,600 men during World War I.",
+        duration: 119,
+        genre: ["Drama", "War"],
+        releaseDate: new Date("2019-12-25"),
+        posterUrl: "https://m.media-amazon.com/images/M/MV5BMjAyNjc4NDY3OV5BMl5BanBnXkFtZTgwNjg4MTkwNzM@._V1_.jpg",
+        rating: 8.3
     }
 ];
+
 
 // Theater data
 const theaters = [
@@ -140,8 +186,35 @@ const theaters = [
                 seats: generateSeats('A', 'J', 18) // 10 rows, 18 seats each
             }
         ]
+    },
+    {
+        name: "Galaxy Cinemas",
+        location: "Galaxy Tower, West Side",
+        seatingCapacity: 180,
+        screens: [
+            {
+                screenNumber: 1,
+                seats: generateSeats('A', 'J', 18) // 10 rows, 18 seats each
+            },
+            {
+                screenNumber: 2,
+                seats: generateSeats('A', 'H', 16) // 8 rows, 16 seats each
+            }
+        ]
+    },
+    {
+        name: "Star Multiplex",
+        location: "Star Plaza, East End",
+        seatingCapacity: 140,
+        screens: [
+            {
+                screenNumber: 1,
+                seats: generateSeats('A', 'I', 14) // 9 rows, 14 seats each
+            }
+        ]
     }
 ];
+
 
 // Function to generate seats
 function generateSeats(startRow, endRow, seatsPerRow) {
@@ -188,47 +261,79 @@ function generateShowTimes(movieId, theaterId, screenNumber) {
     return shows;
 }
 
-// Connect and seed data
+// Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/movie-booking', {
     useNewUrlParser: true,
     useUnifiedTopology: true
-})
-.then(async () => {
-    console.log('Connected to MongoDB');
-    
-    // Clear existing data
-    await Movie.deleteMany({});
-    await Theater.deleteMany({});
-    await Show.deleteMany({});
-    console.log('Cleared existing data');
+});
 
-    // Insert movies
-    const savedMovies = await Movie.insertMany(movies);
-    console.log('Movies added');
+async function seedDatabase() {
+    try {
+        // Clear existing data
+        console.log('Clearing existing data...');
+        await Promise.all([
+            Movie.deleteMany({}),
+            Theater.deleteMany({}),
+            Show.deleteMany({})
+        ]);
 
-    // Insert theaters
-    const savedTheaters = await Theater.insertMany(theaters);
-    console.log('Theaters added');
+        // Seed movies
+        console.log('Seeding movies...');
+        const seededMovies = await Movie.insertMany(movies);
+        console.log(`${seededMovies.length} movies seeded successfully!`);
 
-    // Generate and insert shows
-    const shows = [];
-    savedMovies.forEach(movie => {
-        savedTheaters.forEach(theater => {
-            theater.screens.forEach(screen => {
-                const screenShows = generateShowTimes(movie._id, theater._id, screen.screenNumber);
-                shows.push(...screenShows);
+        // Seed theaters
+        console.log('Seeding theaters...');
+        const seededTheaters = await Theater.insertMany(theaters);
+        console.log(`${seededTheaters.length} theaters seeded successfully!`);
+
+        // Create shows for each movie in each theater
+        console.log('Creating shows...');
+        const shows = [];
+        const today = new Date();
+        const endDate = new Date(today);
+        endDate.setDate(endDate.getDate() + 6);
+
+        seededMovies.forEach(movie => {
+            seededTheaters.forEach(theater => {
+                // Create shows from today to next 6 days
+                for (let date = new Date(today); date <= endDate; date.setDate(date.getDate() + 1)) {
+                    // Create 3 shows per day
+                    [10, 14, 18].forEach(hour => {
+                        const showTime = new Date(date);
+                        showTime.setHours(hour, 0, 0, 0);
+
+                        // Randomly select a screen from the theater
+                        const screen = theater.screens[Math.floor(Math.random() * theater.screens.length)];
+
+                        shows.push({
+                            movie: movie._id,
+                            theater: theater._id,
+                            screen: screen.screenNumber,
+                            showTime: showTime,
+                            price: {
+                                standard: 150,
+                                premium: 200,
+                                vip: 300
+                            },
+                            availableSeats: screen.seats.map(seat => seat.row + seat.number)
+                        });
+                    });
+                }
             });
         });
-    });
 
-    await Show.insertMany(shows);
-    console.log('Shows added');
+        // Seed shows
+        const seededShows = await Show.insertMany(shows);
+        console.log(`${seededShows.length} shows created successfully!`);
 
-    // Disconnect from MongoDB
-    mongoose.disconnect();
-    console.log('Database seeding completed');
-})
-.catch(err => {
-    console.error('Error:', err);
-    mongoose.disconnect();
-}); 
+        console.log('Database seeding completed successfully!');
+    } catch (error) {
+        console.error('Error seeding database:', error);
+    } finally {
+        mongoose.connection.close();
+    }
+}
+
+// Run the seeding
+seedDatabase(); 
