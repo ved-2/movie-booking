@@ -1,0 +1,23 @@
+<div class="container mt-4">
+    <h1>Now Showing</h1>
+    <div class="row mt-4">
+        <% movies.forEach(movie => { %>
+            <div class="col-md-4 mb-4">
+                <div class="card movie-card">
+                    <img src="<%= movie.posterUrl %>" class="card-img-top" alt="<%= movie.title %>">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= movie.title %></h5>
+                        <p class="card-text"><%= movie.description.substring(0, 100) %>...</p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                Duration: <%= movie.duration %> mins | 
+                                Genre: <%= movie.genre.join(', ') %>
+                            </small>
+                        </p>
+                        <a href="/movies/<%= movie._id %>" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+</div>

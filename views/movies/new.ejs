@@ -1,0 +1,28 @@
+<%- include('../layouts/boilerplate') %>
+
+<div class="container">
+    <h1>Add New Movie</h1>
+    <form action="/movies" method="POST">
+        <div class="mb-3">
+            <label for="title" class="form-label">Movie Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="duration" class="form-label">Duration (minutes)</label>
+            <input type="number" class="form-control" id="duration" name="duration" required>
+        </div>
+        <div class="mb-3">
+            <label for="genre" class="form-label">Genre</label>
+            <input type="text" class="form-control" id="genre" name="genre" required>
+        </div>
+        <div class="mb-3">
+            <label for="releaseDate" class="form-label">Release Date</label>
+            <input type="date" class="form-control" id="releaseDate" name="releaseDate" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Movie</button>
+    </form>
+</div> 

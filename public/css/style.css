@@ -1,0 +1,141 @@
+/* General Styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+main {
+    flex: 1;
+}
+
+/* Movie Card Styles */
+.movie-card {
+    transition: transform 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.movie-card:hover {
+    transform: scale(1.02);
+}
+
+.movie-card img {
+    height: 300px;
+    object-fit: cover;
+}
+
+/* Seat Selection Styles */
+.screen {
+    background: #ccc;
+    height: 10px;
+    width: 80%;
+    margin: 20px auto;
+    border-radius: 5px;
+}
+
+.seats-container {
+    text-align: center;
+    margin: 20px auto;
+}
+
+.seat {
+    width: 30px;
+    height: 30px;
+    margin: 3px;
+    border: 1px solid #ccc;
+    display: inline-block;
+    text-align: center;
+    line-height: 30px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.seat.selected {
+    background-color: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.seat.booked {
+    background-color: #dc3545;
+    color: white;
+    cursor: not-allowed;
+    border-color: #dc3545;
+}
+
+/* Booking Summary Styles */
+.booking-summary {
+    position: sticky;
+    top: 20px;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    transition: transform 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Booking page styles */
+.screen-container {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.seat-types {
+    margin-bottom: 20px;
+}
+
+/* Add these to your existing seat styles */
+.seat.standard:not(.selected):not(.booked) {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+.seat.premium:not(.selected):not(.booked) {
+    background-color: #e3f2fd;
+    border-color: #90caf9;
+}
+
+.seat.vip:not(.selected):not(.booked) {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+/* Show times page styles */
+.theater-shows {
+    margin-bottom: 2rem;
+}
+
+.show-times {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.show-time-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.show-time-card:hover {
+    transform: translateY(-2px);
+}
+
+.date-selector .btn-group {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.date-selector .btn {
+    min-width: 120px;
+    white-space: nowrap;
+} 

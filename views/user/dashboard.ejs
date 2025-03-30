@@ -1,0 +1,28 @@
+<%- include('../layouts/boilerplate') %>
+
+<div class="container">
+    <h1>My Bookings</h1>
+    <div class="row mt-4">
+        <% bookings.forEach(booking => { %>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= booking.show.movie.title %></h5>
+                        <p class="card-text">
+                            Theater: <%= booking.show.theater.name %><br>
+                            Date: <%= booking.show.showTime.toLocaleDateString() %><br>
+                            Time: <%= booking.show.showTime.toLocaleTimeString() %><br>
+                            Seats: <%= booking.seats.map(seat => `${seat.row}${seat.number}`).join(', ') %><br>
+                            Amount: $<%= booking.totalAmount %>
+                        </p>
+                        <% if (booking.status === 'confirmed') { %>
+                            <span class="badge bg-success">Confirmed</span>
+                        <% } else { %>
+                            <span class="badge bg-danger">Cancelled</span>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+</div> 

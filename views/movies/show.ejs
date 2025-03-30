@@ -1,0 +1,51 @@
+<%- include('../layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <img src="<%= movie.posterUrl %>" alt="<%= movie.title %>" class="img-fluid rounded">
+        </div>
+        <div class="col-md-8">
+            <h1><%= movie.title %></h1>
+            <p class="lead"><%= movie.description %></p>
+            <div class="movie-info">
+                <p><strong>Duration:</strong> <%= movie.duration %> minutes</p>
+                <p><strong>Genre:</strong> <%= movie.genre.join(', ') %></p>
+                <p><strong>Rating:</strong> <%= movie.rating %>/10</p>
+                <p><strong>Release Date:</strong> <%= movie.releaseDate.toLocaleDateString() %></p>
+            </div>
+
+            <h2 class="mt-4">Today's Shows</h2>
+            <div class="shows-preview mb-4">
+                <% 
+                const today = new Date();
+                const todayShows = shows.filter(show => {
+                    const showDate = new Date(show.showTime);
+                    return showDate.toDateString() === today.toDateString();
+                });
+                %>
+                
+                <% if (todayShows.length > 0) { %>
+                    <div class="row">
+                        <% todayShows.slice(0, 3).forEach(show => { %>
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title"><%= show.theater.name %></h6>
+                                        <p class="card-text">
+                                            <small><%= show.showTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <p>No shows available today</p>
+                <% } %>
+                
+                <a href="/movies/<%= movie._id %>/shows" class="btn btn-primary mt-3">View All Shows</a>
+            </div>
+        </div>
+    </div>
+</div> 

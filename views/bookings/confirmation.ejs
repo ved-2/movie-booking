@@ -1,0 +1,21 @@
+<%- include('../layouts/boilerplate') %>
+
+<div class="container">
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title">Booking Confirmed!</h1>
+            <div class="booking-details">
+                <p><strong>Booking ID:</strong> <%= booking._id %></p>
+                <p><strong>Movie:</strong> <%= booking.show.movie.title %></p>
+                <p><strong>Theater:</strong> <%= booking.show.theater.name %></p>
+                <p><strong>Show Time:</strong> <%= booking.show.showTime.toLocaleTimeString() %></p>
+                <p><strong>Date:</strong> <%= booking.show.showTime.toLocaleDateString() %></p>
+                <p><strong>Seats:</strong> 
+                    <%= booking.seats.map(seat => `${seat.row}${seat.number}`).join(', ') %>
+                </p>
+                <p><strong>Total Amount:</strong> $<%= booking.totalAmount %></p>
+            </div>
+            <a href="/" class="btn btn-primary">Back to Home</a>
+        </div>
+    </div>
+</div> 

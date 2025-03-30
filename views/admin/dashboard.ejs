@@ -1,0 +1,144 @@
+<%- include('../layouts/boilerplate') %>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Admin Menu</h4>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#movies" class="list-group-item list-group-item-action" data-bs-toggle="tab">Movies</a>
+                    <a href="#shows" class="list-group-item list-group-item-action" data-bs-toggle="tab">Shows</a>
+                    <a href="#theaters" class="list-group-item list-group-item-action" data-bs-toggle="tab">Theaters</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="tab-content">
+                <!-- Movies Tab -->
+                <div class="tab-pane fade show active" id="movies">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Movies</h2>
+                        <a href="/admin/movies/new" class="btn btn-primary">Add New Movie</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Genre</th>
+                                    <th>Duration</th>
+                                    <th>Rating</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% movies.forEach(movie => { %>
+                                    <tr>
+                                        <td><%= movie.title %></td>
+                                        <td><%= movie.genre.join(', ') %></td>
+                                        <td><%= movie.duration %> mins</td>
+                                        <td><%= movie.rating %></td>
+                                        <td>
+                                            <a href="/admin/movies/<%= movie._id %>/edit" class="btn btn-sm btn-warning">Edit</a>
+                                            <form action="/admin/movies/<%= movie._id %>?_method=DELETE" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Shows Tab -->
+                <div class="tab-pane fade" id="shows">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Shows</h2>
+                        <a href="/admin/shows/new" class="btn btn-primary">Add New Show</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Movie</th>
+                                    <th>Theater</th>
+                                    <th>Screen</th>
+                                    <th>Show Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% shows.forEach(show => { %>
+                                    <tr>
+                                        <td><%= show.movie.title %></td>
+                                        <td><%= show.theater.name %></td>
+                                        <td><%= show.screen %></td>
+                                        <td><%= show.showTime.toLocaleString() %></td>
+                                        <td>
+                                            <a href="/admin/shows/<%= show._id %>/edit" class="btn btn-sm btn-warning">Edit</a>
+                                            <form action="/admin/shows/<%= show._id %>?_method=DELETE" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Cancel Show</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Theaters Tab -->
+                <div class="tab-pane fade" id="theaters">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Theaters</h2>
+                        <a href="/admin/theaters/new" class="btn btn-primary">Add New Theater</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Location</th>
+                                    <th>Capacity</th>
+                                    <th>Screens</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% theaters.forEach(theater => { %>
+                                    <tr>
+                                        <td><%= theater.name %></td>
+                                        <td><%= theater.location %></td>
+                                        <td><%= theater.seatingCapacity %></td>
+                                        <td><%= theater.screens.length %></td>
+                                        <td>
+                                            <a href="/admin/theaters/<%= theater._id %>/edit" class="btn btn-sm btn-warning">Edit</a>
+                                            <form action="/admin/theaters/<%= theater._id %>?_method=DELETE" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Activate tab based on URL hash
+    const hash = window.location.hash || '#movies';
+    const tab = new bootstrap.Tab(document.querySelector(`a[href="${hash}"]`));
+    tab.show();
+});
+</script> 

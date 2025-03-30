@@ -1,0 +1,131 @@
+<%- include('../layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1><%= movie.title %> - All Shows</h1>
+            
+            <div class="date-selector mb-4">
+                <div class="btn-group">
+                    <% 
+                    const dates = [];
+                    for(let i = 0; i < 7; i++) {
+                        const date = new Date();
+                        date.setDate(date.getDate() + i);
+                        dates.push(date);
+                    }
+                    %>
+                    
+                    <% dates.forEach((date, index) => { %>
+                        <button class="btn btn-outline-primary date-btn <%= index === 0 ? 'active' : '' %>" 
+                                data-date="<%= date.toISOString().split('T')[0] %>">
+                            <%= date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %>
+                        </button>
+                    <% }); %>
+                </div>
+            </div>
+
+            <% dates.forEach((date, index) => { %>
+                <div class="shows-by-date" id="shows-<%= date.toISOString().split('T')[0] %>" 
+                     style="display: <%= index === 0 ? 'block' : 'none' %>">
+                    <% 
+                    const dateShows = shows.filter(show => {
+                        const showDate = new Date(show.showTime);
+                        return showDate.toDateString() === date.toDateString();
+                    });
+                    %>
+                    
+                    <% if (dateShows.length > 0) { %>
+                        <% const theaterGroups = {}; %>
+                        <% dateShows.forEach(show => {
+                            if (!theaterGroups[show.theater._id]) {
+                                theaterGroups[show.theater._id] = {
+                                    theater: show.theater,
+                                    shows: []
+                                };
+                            }
+                            theaterGroups[show.theater._id].shows.push(show);
+                        }); %>
+
+                        <% Object.values(theaterGroups).forEach(group => { %>
+                            <div class="theater-shows card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><%= group.theater.name %></h5>
+                                    <small class="text-muted"><%= group.theater.location %></small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="show-times">
+                                        <% group.shows.forEach(show => { %>
+                                            <div class="show-time-card">
+                                                <div class="time mb-2">
+                                                    <%= show.showTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                                                </div>
+                                                <div class="prices small text-muted mb-2">
+                                                    <div>Standard: ₹<%= show.price.standard %></div>
+                                                    <div>Premium: ₹<%= show.price.premium %></div>
+                                                    <div>VIP: ₹<%= show.price.vip %></div>
+                                                </div>
+                                                <a href="/bookings/new/<%= show._id %>" class="btn btn-sm btn-primary">Book</a>
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <p class="text-center">No shows available on this date</p>
+                    <% } %>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</div>
+
+<style>
+.date-selector {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px 0;
+}
+
+.show-times {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.show-time-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    min-width: 120px;
+}
+
+.time {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateButtons = document.querySelectorAll('.date-btn');
+    const showsContainers = document.querySelectorAll('.shows-by-date');
+
+    dateButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const date = this.dataset.date;
+            
+            // Update active button
+            dateButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show selected date's shows
+            showsContainers.forEach(container => {
+                container.style.display = container.id === `shows-${date}` ? 'block' : 'none';
+            });
+        });
+    });
+});
+</script> 

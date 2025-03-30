@@ -1,0 +1,142 @@
+<%- include('../layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="movie-details mb-4">
+                <h2><%= show.movie.title %></h2>
+                <p>
+                    <strong>Theater:</strong> <%= show.theater.name %><br>
+                    <strong>Screen:</strong> <%= show.screen %><br>
+                    <strong>Show Time:</strong> <%= show.showTime.toLocaleString() %>
+                </p>
+            </div>
+
+            <div class="screen-container">
+                <div class="screen mb-4">
+                    <p class="text-center text-muted mb-2">SCREEN</p>
+                    <div class="screen-line"></div>
+                </div>
+
+                <div class="seats-container text-center">
+                    <div class="seat-types mb-3">
+                        <span class="badge bg-success me-2">Standard (₹<%= show.price.standard %>)</span>
+                        <span class="badge bg-primary me-2">Premium (₹<%= show.price.premium %>)</span>
+                        <span class="badge bg-warning">VIP (₹<%= show.price.vip %>)</span>
+                    </div>
+
+                    <div class="seats-grid">
+                        <% show.theater.screens.find(s => s.screenNumber === show.screen).seats.forEach(seat => { %>
+                            <div class="seat <%= seat.type %> <%= show.availableSeats.includes(seat.row + seat.number) ? 'booked' : '' %>"
+                                 data-row="<%= seat.row %>" 
+                                 data-number="<%= seat.number %>"
+                                 data-type="<%= seat.type %>"
+                                 data-price="<%= show.price[seat.type] %>">
+                                <%= seat.row %><%= seat.number %>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="booking-summary card">
+                <div class="card-body">
+                    <h3 class="card-title">Booking Summary</h3>
+                    <div class="selected-seats mt-3">
+                        <p><strong>Selected Seats:</strong> <span id="selectedSeatsDisplay">None</span></p>
+                        <p><strong>Total Amount:</strong> ₹<span id="totalAmount">0</span></p>
+                    </div>
+                    <form action="/bookings" method="POST" id="bookingForm">
+                        <input type="hidden" name="showId" value="<%= show._id %>">
+                        <input type="hidden" name="selectedSeats" id="selectedSeatsInput">
+                        <input type="hidden" name="totalAmount" id="totalAmountInput">
+                        <button type="submit" class="btn btn-primary w-100" id="bookButton" disabled>
+                            Confirm Booking
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.screen-line {
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.seats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 40px);
+    gap: 10px;
+    justify-content: center;
+    padding: 20px;
+}
+
+.seat {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s;
+}
+
+.seat.standard { background-color: #f8f9fa; }
+.seat.premium { background-color: #e3f2fd; }
+.seat.vip { background-color: #fff3cd; }
+
+.seat:hover:not(.booked) { transform: scale(1.1); }
+.seat.selected { background-color: #28a745; color: white; }
+.seat.booked { background-color: #dc3545; color: white; cursor: not-allowed; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const seats = document.querySelectorAll('.seat:not(.booked)');
+    const selectedSeatsDisplay = document.getElementById('selectedSeatsDisplay');
+    const totalAmountDisplay = document.getElementById('totalAmount');
+    const selectedSeatsInput = document.getElementById('selectedSeatsInput');
+    const totalAmountInput = document.getElementById('totalAmountInput');
+    const bookButton = document.getElementById('bookButton');
+    const selectedSeats = new Set();
+
+    seats.forEach(seat => {
+        seat.addEventListener('click', function() {
+            if (this.classList.contains('booked')) return;
+
+            this.classList.toggle('selected');
+            const seatId = this.dataset.row + this.dataset.number;
+
+            if (this.classList.contains('selected')) {
+                selectedSeats.add(seatId);
+            } else {
+                selectedSeats.delete(seatId);
+            }
+
+            updateBookingSummary();
+        });
+    });
+
+    function updateBookingSummary() {
+        const selectedSeatsArray = Array.from(selectedSeats);
+        const totalAmount = Array.from(document.querySelectorAll('.seat.selected'))
+            .reduce((sum, seat) => sum + parseInt(seat.dataset.price), 0);
+
+        selectedSeatsDisplay.textContent = selectedSeatsArray.length ? selectedSeatsArray.join(', ') : 'None';
+        totalAmountDisplay.textContent = totalAmount;
+        selectedSeatsInput.value = JSON.stringify(selectedSeatsArray);
+        totalAmountInput.value = totalAmount;
+        bookButton.disabled = selectedSeatsArray.length === 0;
+    }
+});
+</script> 
